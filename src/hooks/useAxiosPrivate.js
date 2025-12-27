@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useRefreshToken from './useRefreshToken';
 import useAuth from './useAuth';
-import { axiosPrivate } from '../utils/request';
+import { axiosPrivate } from '~/api/axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const useAxiosPrivate = () => {

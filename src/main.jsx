@@ -4,6 +4,7 @@ import './index.css';
 import App from './App.jsx';
 import GlobalStyles from './components/GlobalStyles';
 import { AuthProvider } from './contexts/AuthProvider';
+import './i18n';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

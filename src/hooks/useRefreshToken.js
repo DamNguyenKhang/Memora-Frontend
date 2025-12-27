@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '~/api/axios';
 import useAuth from './useAuth';
 import { REFRESH_TOKEN } from '../constants/APIs';
 
