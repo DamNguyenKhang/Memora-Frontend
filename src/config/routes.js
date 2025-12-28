@@ -1,6 +1,8 @@
+import { AUTHENTICATION_PAGE } from '~/constants/pages';
+
 const routes =  {
     home: '/',
-    auth: '/auth',
+    auth: AUTHENTICATION_PAGE,
 }
 
 export default routes;

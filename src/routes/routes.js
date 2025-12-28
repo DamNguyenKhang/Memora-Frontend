@@ -1,10 +1,10 @@
 import Home from '~/pages/Home';
 import config from '~/config';
-import Login from '~/pages/auth/Login';
+import AuthPage from '~/pages/auth/AuthPage';
 
 const publicRoutes = [
     { path: config.routes.home, component: Home },
-    { path: config.routes.auth, component: Login, layout: null },
+    { path: config.routes.auth, component: AuthPage, layout: null },
 ];
 
 const privateRoutes = [];
