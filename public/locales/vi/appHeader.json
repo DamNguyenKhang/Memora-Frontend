@@ -1,10 +1,14 @@
 {
   "home": "Trang chủ",
+  "library": "Thư viện",
   "venues": "Sân bóng",
   "coaches": "Huấn luyện viên",
   "community": "Cộng đồng",
   "login": "Đăng nhập",
   "logout": "Đăng xuất",
+  "signup": "Đăng ký",
+  "create_flashcard": "Tạo flashcard",
+  "searchPlaceholder": "Tìm kiếm...",
   "profile": "Hồ sơ",
   "history": "Lịch sử",
   "menu": "Menu"

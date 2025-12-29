@@ -1,10 +1,14 @@
 {
   "home": "Home",
+  "library": "Library",
   "venues": "Venues",
   "coaches": "Coaches",
   "community": "Community",
   "login": "Login",
   "logout": "Logout",
+  "signup": "Sign Up",
+  "create_flashcard": "Create Flashcard",
+  "searchPlaceholder": "Search...",
   "profile": "Profile",
   "history": "History",
   "menu": "Menu"
