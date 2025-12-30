@@ -1,12 +1,40 @@
-import { Brain } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Brain, User, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
 import { AUTHENTICATION_PAGE } from '~/constants/pages';
-// import { useTranslation } from 'react-i18next';
-// import useAuth from '~/hooks/useAuth';
+import useAuth from '~/hooks/useAuth';
+import { Dropdown } from 'antd';
+import * as authenticationService from '~/services/authenticationService';
 
 function Header() {
+    const { auth, setAuth } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        await authenticationService.logout();
+        setAuth({});
+        navigate(AUTHENTICATION_PAGE);
+    };
+
+    const userMenuItems = [
+        {
+            key: 'profile',
+            label: 'Profile',
+            icon: <User className="w-4 h-4" />,
+            onClick: () => navigate('/profile'),
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: 'logout',
+            label: 'Logout',
+            icon: <LogOut className="w-4 h-4" />,
+            onClick: handleLogout,
+            danger: true,
+        },
+    ];
+
     return (
         <nav className="bg-white border-b border-indigo-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,11 +55,26 @@ function Header() {
                             Community
                         </a>
 
-                        <Button variant="link" to={AUTHENTICATION_PAGE} className="text-indigo-600 hover:text-indigo-700">
-                            <Link to={AUTHENTICATION_PAGE}>Sign In</Link>
-                        </Button>
+                        {auth?.user ? (
+                            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
+                                <div className="flex items-center gap-2 cursor-pointer hover:bg-indigo-50 px-3 py-2 rounded-lg transition-colors">
+                                    <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-medium">
+                                        {auth.user.username?.charAt(0).toUpperCase() || 'U'}
+                                    </div>
+                                    <span className="text-gray-700 font-medium">{auth.user.username}</span>
+                                </div>
+                            </Dropdown>
+                        ) : (
+                            <>
+                                <Button variant="link" className="text-indigo-600 hover:text-indigo-700">
+                                    <Link to={AUTHENTICATION_PAGE}>Sign In</Link>
+                                </Button>
 
-                        <Button className="bg-indigo-600 hover:bg-indigo-700">Get Started</Button>
+                                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                                    <Link to={AUTHENTICATION_PAGE}>Get Started</Link>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
