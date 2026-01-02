@@ -38,7 +38,7 @@ export const logout = async () => {
 export const checkEmailExist = async (email) => {
     try {
         const response = await axios.post(CHECK_EMAIL_EXIST, { email });
-        return response.data;
+        return response.data.result;
     } catch (error) {
         console.log(error);
     }
@@ -47,7 +47,7 @@ export const checkEmailExist = async (email) => {
 export const checkUsernameExist = async (username) => {
     try {
         const response = await axios.post(CHECK_USERNAME_EXIST, { username });
-        return response.data;
+        return response.data.result;
     } catch (error) {
         console.log(error);
     }
