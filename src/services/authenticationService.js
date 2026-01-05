@@ -1,5 +1,12 @@
 import axios from '~/api/axios';
-import { LOGIN, REGISTER, LOGOUT, CHECK_EMAIL_EXIST, CHECK_USERNAME_EXIST } from '~/constants/APIs';
+import {
+    LOGIN,
+    REGISTER,
+    LOGOUT,
+    CHECK_EMAIL_EXIST,
+    CHECK_USERNAME_EXIST,
+    SEND_EMAIL_VERIFICATION,
+} from '~/constants/APIs';
 
 export const login = async (identifier, password) => {
     try {
@@ -48,6 +55,15 @@ export const checkUsernameExist = async (username) => {
     try {
         const response = await axios.post(CHECK_USERNAME_EXIST, { username });
         return response.data.result;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const sendEmailVerification = async () => {
+    try {
+        const response = await axios.get(SEND_EMAIL_VERIFICATION);
+        return response.data;
     } catch (error) {
         console.log(error);
     }

@@ -3,14 +3,14 @@ import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
 import { Form, Card, Typography, message, Divider, Tabs } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DatePicker } from '~/components/ui/date-picker';
 import Lottie from 'lottie-react';
 import loginAnimation from '~/assets/lottie/login-animation.json';
 import googleLogo from '~/assets/images/google-logo.png';
 import * as authenticationService from '~/services/authenticationService';
-import { isValidUsername, isValidPassword } from '~/utils/validators';
+import { isValidUsername, isValidPassword, isValidEmail } from '~/utils/validators';
 import useAuth from '~/hooks/useAuth';
 import useDebounced from '~/hooks/useDebounced';
 
@@ -26,10 +26,11 @@ const AuthPage = () => {
     const usernameDebounced = useDebounced(username, 500);
     const emailDebounced = useDebounced(email, 500);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState('login');
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState(location.state?.tab ?? 'login');
     const navigate = useNavigate();
 
-    const onLoginFinish = async (values) => {
+    const onLoginFinish = async (values) => {   
         setLoading(true);
         try {
             console.log('Login values:', values);
@@ -264,6 +265,8 @@ const AuthPage = () => {
     useEffect(() => {
         if (!usernameDebounced) return;
 
+        if(!isValidUsername(usernameDebounced)) return;
+
         let cancelled = false;
 
         (async () => {
@@ -294,6 +297,8 @@ const AuthPage = () => {
     useEffect(() => {
         if (!emailDebounced) return;
 
+        if(!isValidEmail(emailDebounced)) return;
+
         let cancelled = false;
 
         (async () => {
@@ -320,6 +325,12 @@ const AuthPage = () => {
 
         return () => (cancelled = true);
     }, [emailDebounced]);
+
+    useEffect(() => {
+        if(location.state?.tab){
+            setActiveTab(location.state?.tab);
+        }
+    }, [location.state]);
 
     return (
         <div className="min-h-screen h-screen w-screen flex items-stretch justify-stretch bg-white p-0 m-0 relative overflow-hidden">

@@ -67,11 +67,11 @@ function Header() {
                         ) : (
                             <>
                                 <Button variant="link" className="text-indigo-600 hover:text-indigo-700">
-                                    <Link to={AUTHENTICATION_PAGE}>Sign In</Link>
+                                    <Link to={AUTHENTICATION_PAGE} state={{tab: 'login'}}>Sign In</Link>
                                 </Button>
 
                                 <Button className="bg-indigo-600 hover:bg-indigo-700">
-                                    <Link to={AUTHENTICATION_PAGE}>Get Started</Link>
+                                    <Link to={AUTHENTICATION_PAGE} state={{tab: 'register'}}>Get Started</Link>
                                 </Button>
                             </>
                         )}
