@@ -4,14 +4,15 @@ import { Button } from '~/components/ui/button';
 import { AUTHENTICATION_PAGE } from '~/constants/pages';
 import useAuth from '~/hooks/useAuth';
 import { Dropdown } from 'antd';
-import * as authenticationService from '~/services/authenticationService';
+import { post } from '~/api/http';
+import { LOGOUT } from '~/constants/APIs';
 
 function Header() {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        await authenticationService.logout();
+        await post(LOGOUT);
         setAuth({});
         navigate(AUTHENTICATION_PAGE);
     };

@@ -7,5 +7,6 @@ export const REGISTER = '/auth/register';
 export const LOGOUT = '/auth/logout';
 export const CHECK_EMAIL_EXIST = '/auth/check-email-exist';
 export const CHECK_USERNAME_EXIST = '/auth/check-username-exist';
-export const SEND_EMAIL_VERIFICATION = '/auth/send-email-verification';
+export const RESEND_EMAIL_VERIFICATION = '/auth/resend-email-verification';
+export const VERIFY_EMAIL = '/auth/verify-email';
 

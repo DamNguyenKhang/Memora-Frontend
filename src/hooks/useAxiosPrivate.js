@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useRefreshToken from './useRefreshToken';
 import useAuth from './useAuth';
-import axios from '~/api/axios';
+import http from '~/api/http';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AUTHENTICATION_PAGE } from '~/constants/pages';
 
@@ -12,7 +12,7 @@ const useAxiosPrivate = () => {
     const location = useLocation();
 
     useEffect(() => {
-        const requestIntercept = axios.interceptors.request.use(
+        const requestIntercept = http.interceptors.request.use(
             (config) => {
                 if (!config.headers['Authorization']) {
                     config.headers['Authorization'] = `Bearer ${auth?.accessToken}`;
@@ -22,7 +22,7 @@ const useAxiosPrivate = () => {
             (error) => Promise.reject(error),
         );
 
-        const responseIntercept = axios.interceptors.response.use(
+        const responseIntercept = http.interceptors.response.use(
             (response) => response,
             async (error) => {
                 const prevRequest = error?.config;
@@ -31,7 +31,7 @@ const useAxiosPrivate = () => {
                     try {
                         const newAccessToken = await refresh();
                         prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                        return axios(prevRequest);
+                        return http(prevRequest);
                     } catch (refreshError) {
                         navigate(AUTHENTICATION_PAGE, { state: { from: location }, replace: true });
                         return Promise.reject(refreshError);
@@ -40,11 +40,11 @@ const useAxiosPrivate = () => {
             },
         );
         return () => {
-            axios.interceptors.request.eject(requestIntercept);
-            axios.interceptors.response.eject(responseIntercept);
+            http.interceptors.request.eject(requestIntercept);
+            http.interceptors.response.eject(responseIntercept);
         };
     }, [auth, refresh, navigate, location]);
 
-    return axios;
+    return http;
 };
 export default useAxiosPrivate;

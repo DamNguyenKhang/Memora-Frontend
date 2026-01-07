@@ -13,6 +13,9 @@ import * as authenticationService from '~/services/authenticationService';
 import { isValidUsername, isValidPassword, isValidEmail } from '~/utils/validators';
 import useAuth from '~/hooks/useAuth';
 import useDebounced from '~/hooks/useDebounced';
+import { LOGIN, REGISTER, VERIFY_EMAIL } from '~/constants/APIs';
+import { post } from '~/api/http';
+import isSuccessResponse from '~/utils/checkResponse';
 
 const { Title, Text } = Typography;
 
@@ -30,17 +33,26 @@ const AuthPage = () => {
     const [activeTab, setActiveTab] = useState(location.state?.tab ?? 'login');
     const navigate = useNavigate();
 
-    const onLoginFinish = async (values) => {   
+    const onLoginFinish = async (values) => {
         setLoading(true);
         try {
-            console.log('Login values:', values);
-            const response = await authenticationService.login(values.identifier, values.password);
-            console.log('Login response:', response);
-            setAuth({ user: response.result.user, accessToken: response.result.accessToken });
-            message.success(t('login_success'));
-            navigate('/');
-        } catch {
-            message.error(t('login_failed'));
+            const response = await post(LOGIN, {
+                identifier: values.identifier,
+                password: values.password,
+            });
+            if (isSuccessResponse(response)) {
+                setAuth({ user: response.result.user, accessToken: response.result.accessToken });
+                message.success(t('login_success'));
+                navigate('/');
+            }
+        } catch (error) {
+            if (error.response.data.status === 403) {
+                navigate(VERIFY_EMAIL, {
+                    state: { email: values.email },
+                });
+            } else {
+                message.error(t('login_failed'));
+            }
         } finally {
             setLoading(false);
         }
@@ -49,12 +61,18 @@ const AuthPage = () => {
     const onRegisterFinish = async (values) => {
         setLoading(true);
         try {
-            console.log('Register values:', values);
-            const response = await authenticationService.register(values.username, values.email, values.password);
-            console.log('Register response:', response);
-            message.success(t('register_success'));
-            setActiveTab('login');
-            registerForm.resetFields();
+            const response = await post(REGISTER, {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+            });
+
+            if (isSuccessResponse(response)) {
+                navigate('/verify-email', {
+                    state: { email: values.email },
+                });
+                registerForm.resetFields();
+            }
         } catch {
             message.error(t('register_failed'));
         } finally {
@@ -212,9 +230,7 @@ const AuthPage = () => {
                                     if (!value || isValidPassword(value)) {
                                         return Promise.resolve();
                                     }
-                                    return Promise.reject(
-                                        new Error(t('password_invalid_format'))
-                                    );
+                                    return Promise.reject(new Error(t('password_invalid_format')));
                                 },
                             },
                         ]}
@@ -265,7 +281,7 @@ const AuthPage = () => {
     useEffect(() => {
         if (!usernameDebounced) return;
 
-        if(!isValidUsername(usernameDebounced)) return;
+        if (!isValidUsername(usernameDebounced)) return;
 
         let cancelled = false;
 
@@ -297,7 +313,7 @@ const AuthPage = () => {
     useEffect(() => {
         if (!emailDebounced) return;
 
-        if(!isValidEmail(emailDebounced)) return;
+        if (!isValidEmail(emailDebounced)) return;
 
         let cancelled = false;
 
@@ -327,7 +343,7 @@ const AuthPage = () => {
     }, [emailDebounced]);
 
     useEffect(() => {
-        if(location.state?.tab){
+        if (location.state?.tab) {
             setActiveTab(location.state?.tab);
         }
     }, [location.state]);

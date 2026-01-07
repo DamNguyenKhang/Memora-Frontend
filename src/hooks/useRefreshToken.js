@@ -1,4 +1,4 @@
-import axios from '~/api/axios';
+import { post } from '~/api/http';
 import useAuth from './useAuth';
 import { REFRESH_TOKEN } from '../constants/APIs';
 
@@ -7,19 +7,19 @@ const useRefreshToken = () => {
 
     const refresh = async () => {
         const userId = auth?.user?.id;
-        const response = await axios.post(REFRESH_TOKEN, {
+        const response = await post(REFRESH_TOKEN, {
             userId,
             withCredentials: true,
         });
         setAuth((prev) => {
             console.log(JSON.stringify(prev));
-            console.log(response.data.accessToken);
+            console.log(response.result.accessToken);
             return {
                 ...prev,
-                accessToken: response.data.accessToken,
+                accessToken: response.result.accessToken,
             };
         });
-        return response.data.accessToken;
+        return response.result.accessToken;
     };
     return refresh;
 };
