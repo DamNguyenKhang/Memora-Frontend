@@ -6,6 +6,7 @@ import useAuth from '~/hooks/useAuth';
 import { Dropdown } from 'antd';
 import { post } from '~/api/http';
 import { LOGOUT } from '~/constants/APIs';
+import { useEffect } from 'react';
 
 function Header() {
     const { auth, setAuth } = useAuth();
@@ -36,6 +37,10 @@ function Header() {
             danger: true,
         },
     ];
+
+    useEffect(() => {
+        console.log(auth);
+    }, [auth]);
 
     return (
         <nav className="bg-white border-b border-indigo-100">

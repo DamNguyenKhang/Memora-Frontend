@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Mail, RefreshCw } from 'lucide-react';
 import { Button } from '~/components/ui/button';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { LOGIN, RESEND_EMAIL_VERIFICATION, VERIFY_EMAIL } from '~/constants/APIs';
+import { RESEND_EMAIL_VERIFICATION, VERIFY_EMAIL } from '~/constants/APIs';
 import { post } from '~/api/http';
 import { message } from 'antd';
 import isSuccessResponse from '~/utils/checkResponse';
 import useAuth from '~/hooks/useAuth';
+import { AUTHENTICATION_PAGE } from '~/constants/pages';
 
 export default function EmailVerification() {
     const [isResending, setIsResending] = useState(false);
@@ -33,7 +34,7 @@ export default function EmailVerification() {
     };
 
     const handleBackToLogin = () => {
-        navigate(LOGIN);
+        navigate(AUTHENTICATION_PAGE);
     };
 
     useEffect(() => {
@@ -46,7 +47,13 @@ export default function EmailVerification() {
                     email,
                 });
                 if (isSuccessResponse(response)) {
-                    setAuth({ user: response.result.user, accessToken: response.result.accessToken });
+                    const authData = {
+                        user: response.result.user,
+                        accessToken: response.result.accessToken,
+                    };
+
+                    sessionStorage.setItem('auth', JSON.stringify(authData));
+                    setAuth(authData);
                     message.success('Verify email successfully');
                     navigate(redirectTo, { replace: true });
                 }

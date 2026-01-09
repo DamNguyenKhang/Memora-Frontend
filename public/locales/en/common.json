@@ -1,0 +1,21 @@
+{
+  "date": {
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
+  }
+}

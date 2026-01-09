@@ -5,7 +5,6 @@ import { Form, Card, Typography, message, Divider, Tabs } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DatePicker } from '~/components/ui/date-picker';
 import Lottie from 'lottie-react';
 import loginAnimation from '~/assets/lottie/login-animation.json';
 import googleLogo from '~/assets/images/google-logo.png';
@@ -13,10 +12,12 @@ import * as authenticationService from '~/services/authenticationService';
 import { isValidUsername, isValidPassword, isValidEmail } from '~/utils/validators';
 import useAuth from '~/hooks/useAuth';
 import useDebounced from '~/hooks/useDebounced';
-import { LOGIN, REGISTER, VERIFY_EMAIL, GOOGLE_LOGIN } from '~/constants/APIs';
+import { LOGIN, REGISTER, GOOGLE_LOGIN } from '~/constants/APIs';
+import { VERIFY_EMAIL } from '~/constants/pages';
 import { post } from '~/api/http';
 import isSuccessResponse from '~/utils/checkResponse';
 import { GoogleLogin } from '@react-oauth/google';
+import DatePicker from '~/components/ui/date-picker';
 
 const { Title, Text } = Typography;
 
@@ -43,7 +44,13 @@ const AuthPage = () => {
                 password: values.password,
             });
             if (isSuccessResponse(response)) {
-                setAuth({ user: response.result.user, accessToken: response.result.accessToken });
+                const authData = {
+                    user: response.result.user,
+                    accessToken: response.result.accessToken,
+                };
+
+                sessionStorage.setItem('auth', JSON.stringify(authData));
+                setAuth(authData);
                 message.success(t('login_success'));
                 navigate(redirectTo, { replace: true });
             }
@@ -67,9 +74,11 @@ const AuthPage = () => {
                 username: values.username,
                 email: values.email,
                 password: values.password,
+                dateOfBirth: values.dateOfBirth
             });
 
             if (isSuccessResponse(response)) {
+                console.log(redirectTo);
                 navigate(VERIFY_EMAIL, {
                     state: { email: values.email, redirectTo },
                 });
@@ -96,11 +105,13 @@ const AuthPage = () => {
             });
 
             if (isSuccessResponse(response)) {
-                setAuth({
+                const authData = {
                     user: response.result.user,
                     accessToken: response.result.accessToken,
-                });
+                };
 
+                sessionStorage.setItem('auth', JSON.stringify(authData));
+                setAuth(authData);
                 message.success(t('login_success'));
                 navigate('/');
             }
@@ -235,15 +246,7 @@ const AuthPage = () => {
                             },
                         ]}
                     >
-                        <DatePicker
-                            placeholder={t('date_of_birth_placeholder')}
-                            className="w-full"
-                            disabledDate={(current) => {
-                                const thirteenYearsAgo = new Date();
-                                thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
-                                return current && current > thirteenYearsAgo;
-                            }}
-                        />
+                        <DatePicker />
                     </Form.Item>
 
                     <Form.Item
