@@ -1,9 +1,9 @@
-import { AUTHENTICATION_PAGE, SEND_EMAIL_VERIFICATION } from '~/constants/pages';
+import { AUTHENTICATION_PAGE, VERIFY_EMAIL } from '~/constants/pages';
 
 const routes = {
     home: '/',
     auth: AUTHENTICATION_PAGE,
-    emailVerification: SEND_EMAIL_VERIFICATION,
+    emailVerification: VERIFY_EMAIL,
 };
 
 export default routes;

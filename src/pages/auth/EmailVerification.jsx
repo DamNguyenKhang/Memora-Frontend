@@ -6,11 +6,14 @@ import { LOGIN, RESEND_EMAIL_VERIFICATION, VERIFY_EMAIL } from '~/constants/APIs
 import { post } from '~/api/http';
 import { message } from 'antd';
 import isSuccessResponse from '~/utils/checkResponse';
+import useAuth from '~/hooks/useAuth';
 
 export default function EmailVerification() {
     const [isResending, setIsResending] = useState(false);
+    const { setAuth } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+    const redirectTo = location.state?.redirectTo ?? '/';
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const email = searchParams.get('email') ?? location.state?.email;
@@ -34,6 +37,8 @@ export default function EmailVerification() {
     };
 
     useEffect(() => {
+        if (!token || !email) return;
+
         const verifyEmail = async () => {
             try {
                 const response = await post(VERIFY_EMAIL, {
@@ -41,17 +46,18 @@ export default function EmailVerification() {
                     email,
                 });
                 if (isSuccessResponse(response)) {
+                    setAuth({ user: response.result.user, accessToken: response.result.accessToken });
                     message.success('Verify email successfully');
-                    navigate('/');
+                    navigate(redirectTo, { replace: true });
                 }
             } catch (error) {
-                message.error(error.response.data.detail);
-                console.log(error.response.data);
+                if (error.status >= 400) {
+                    message.error(error.response.data.detail);
+                }
+                console.log(error);
             }
         };
-        if (!token || !email) {
-            verifyEmail();
-        }
+        verifyEmail();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [email, token]);
 

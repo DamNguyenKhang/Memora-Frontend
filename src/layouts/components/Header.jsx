@@ -1,5 +1,5 @@
 import { Brain, User, LogOut } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '~/components/ui/button';
 import { AUTHENTICATION_PAGE } from '~/constants/pages';
 import useAuth from '~/hooks/useAuth';
@@ -10,6 +10,7 @@ import { LOGOUT } from '~/constants/APIs';
 function Header() {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const handleLogout = async () => {
         await post(LOGOUT);
@@ -68,11 +69,18 @@ function Header() {
                         ) : (
                             <>
                                 <Button variant="link" className="text-indigo-600 hover:text-indigo-700">
-                                    <Link to={AUTHENTICATION_PAGE} state={{tab: 'login'}}>Sign In</Link>
+                                    <Link
+                                        to={AUTHENTICATION_PAGE}
+                                        state={{ tab: 'login', redirectTo: location.pathname + location.search }}
+                                    >
+                                        Sign In
+                                    </Link>
                                 </Button>
 
                                 <Button className="bg-indigo-600 hover:bg-indigo-700">
-                                    <Link to={AUTHENTICATION_PAGE} state={{tab: 'register'}}>Get Started</Link>
+                                    <Link to={AUTHENTICATION_PAGE} state={{ tab: 'register' }}>
+                                        Get Started
+                                    </Link>
                                 </Button>
                             </>
                         )}

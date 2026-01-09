@@ -33,7 +33,7 @@ const useAxiosPrivate = () => {
                         prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
                         return http(prevRequest);
                     } catch (refreshError) {
-                        navigate(AUTHENTICATION_PAGE, { state: { from: location }, replace: true });
+                        navigate(AUTHENTICATION_PAGE, { state: { redirectTo: location.pathname + location.search }, replace: true });
                         return Promise.reject(refreshError);
                     }
                 }

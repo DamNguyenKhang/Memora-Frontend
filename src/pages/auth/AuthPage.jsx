@@ -13,9 +13,10 @@ import * as authenticationService from '~/services/authenticationService';
 import { isValidUsername, isValidPassword, isValidEmail } from '~/utils/validators';
 import useAuth from '~/hooks/useAuth';
 import useDebounced from '~/hooks/useDebounced';
-import { LOGIN, REGISTER, VERIFY_EMAIL } from '~/constants/APIs';
+import { LOGIN, REGISTER, VERIFY_EMAIL, GOOGLE_LOGIN } from '~/constants/APIs';
 import { post } from '~/api/http';
 import isSuccessResponse from '~/utils/checkResponse';
+import { GoogleLogin } from '@react-oauth/google';
 
 const { Title, Text } = Typography;
 
@@ -30,6 +31,7 @@ const AuthPage = () => {
     const emailDebounced = useDebounced(email, 500);
     const [loading, setLoading] = useState(false);
     const location = useLocation();
+    const redirectTo = location.state?.redirectTo ?? '/';
     const [activeTab, setActiveTab] = useState(location.state?.tab ?? 'login');
     const navigate = useNavigate();
 
@@ -43,12 +45,12 @@ const AuthPage = () => {
             if (isSuccessResponse(response)) {
                 setAuth({ user: response.result.user, accessToken: response.result.accessToken });
                 message.success(t('login_success'));
-                navigate('/');
+                navigate(redirectTo, { replace: true });
             }
         } catch (error) {
             if (error.response.data.status === 403) {
                 navigate(VERIFY_EMAIL, {
-                    state: { email: values.email },
+                    state: { email: values.email, redirectTo },
                 });
             } else {
                 message.error(t('login_failed'));
@@ -68,8 +70,8 @@ const AuthPage = () => {
             });
 
             if (isSuccessResponse(response)) {
-                navigate('/verify-email', {
-                    state: { email: values.email },
+                navigate(VERIFY_EMAIL, {
+                    state: { email: values.email, redirectTo },
                 });
                 registerForm.resetFields();
             }
@@ -80,8 +82,32 @@ const AuthPage = () => {
         }
     };
 
-    const handleGoogleLogin = () => {
-        message.info(t('google_login_info'));
+    const onGoogleLoginSuccess = async (credentialResponse) => {
+        try {
+            const idToken = credentialResponse.credential;
+
+            if (!idToken) {
+                message.error(t('google_login_failed'));
+                return;
+            }
+
+            const response = await post(GOOGLE_LOGIN, {
+                idToken,
+            });
+
+            if (isSuccessResponse(response)) {
+                setAuth({
+                    user: response.result.user,
+                    accessToken: response.result.accessToken,
+                });
+
+                message.success(t('login_success'));
+                navigate('/');
+            }
+        } catch (error) {
+            console.error(error);
+            message.error(t('google_login_failed'));
+        }
     };
 
     const tabItems = [
@@ -373,7 +399,7 @@ const AuthPage = () => {
 
                 {/* Right side - Auth Form */}
                 <div className="flex items-start justify-center p-10 md:p-10 bg-white min-h-screen overflow-y-auto">
-                    <Card className="w-full max-w-[500px] shadow-none border-none" bordered={false}>
+                    <Card className="w-full max-w-[500px] shadow-none border-none">
                         <div className="text-center mb-8">
                             <Title level={2} className="!mb-2 font-bold text-gray-900">
                                 {activeTab === 'login' ? t('login_title') : t('register_title')}
@@ -394,15 +420,27 @@ const AuthPage = () => {
                         <Divider className="!my-6 text-gray-500 text-sm">{t('or')}</Divider>
 
                         <div>
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                className="w-full h-12 rounded-lg border-2 border-gray-300 font-medium transition-all duration-300 hover:border-indigo-600 hover:text-indigo-600 hover:bg-indigo-50 flex items-center justify-center gap-2"
-                                onClick={handleGoogleLogin}
-                            >
-                                <img src={googleLogo} alt="Google" className="w-5 h-5" />
-                                {activeTab === 'login' ? t('login_with_google') : t('register_with_google')}
-                            </Button>
+                            <div className="relative w-full group">
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    className="w-full h-12 rounded-lg border-2 border-gray-300 font-medium transition-all duration-300 group-hover:border-indigo-600 group-hover:text-indigo-600 group-hover:bg-indigo-50 flex items-center justify-center gap-2"
+                                >
+                                    <img src={googleLogo} alt="Google" className="w-5 h-5" />{' '}
+                                    {activeTab === 'login' ? t('login_with_google') : t('register_with_google')}{' '}
+                                </Button>
+
+                                <div className="absolute inset-0 opacity-0">
+                                    <GoogleLogin
+                                        onSuccess={onGoogleLoginSuccess}
+                                        onError={() => message.error(t('google_login_failed'))}
+                                        useOneTap={false}
+                                        theme="outline"
+                                        size="large"
+                                        width="100%"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </Card>
                 </div>
