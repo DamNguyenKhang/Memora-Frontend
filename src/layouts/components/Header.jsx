@@ -6,7 +6,6 @@ import useAuth from '~/hooks/useAuth';
 import { Dropdown } from 'antd';
 import { post } from '~/api/http';
 import { LOGOUT } from '~/constants/APIs';
-import { useEffect } from 'react';
 
 function Header() {
     const { auth, setAuth } = useAuth();
@@ -37,10 +36,6 @@ function Header() {
             danger: true,
         },
     ];
-
-    useEffect(() => {
-        console.log(auth);
-    }, [auth]);
 
     return (
         <nav className="bg-white border-b border-indigo-100">
@@ -73,7 +68,7 @@ function Header() {
                             </Dropdown>
                         ) : (
                             <>
-                                <Button variant="link" className="text-indigo-600 hover:text-indigo-700">
+                                <Button size="sm" variant="link" className="text-indigo-600 hover:text-indigo-700">
                                     <Link
                                         to={AUTHENTICATION_PAGE}
                                         state={{ tab: 'login', redirectTo: location.pathname + location.search }}
@@ -82,7 +77,7 @@ function Header() {
                                     </Link>
                                 </Button>
 
-                                <Button className="bg-indigo-600 hover:bg-indigo-700">
+                                <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
                                     <Link to={AUTHENTICATION_PAGE} state={{ tab: 'register' }}>
                                         Get Started
                                     </Link>

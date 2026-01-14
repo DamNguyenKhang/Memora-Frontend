@@ -74,7 +74,7 @@ const AuthPage = () => {
                 username: values.username,
                 email: values.email,
                 password: values.password,
-                dateOfBirth: values.dateOfBirth
+                dateOfBirth: values.dateOfBirth,
             });
 
             if (isSuccessResponse(response)) {
@@ -167,12 +167,7 @@ const AuthPage = () => {
                     </div>
 
                     <Form.Item className="!mb-0">
-                        <Button
-                            variant="default"
-                            size="lg"
-                            className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-base rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
-                            disabled={loading}
-                        >
+                        <Button variant="default" size="lg" className="w-full " disabled={loading}>
                             {loading ? t('loading') : t('login_button')}
                         </Button>
                     </Form.Item>
@@ -293,12 +288,7 @@ const AuthPage = () => {
                     </Form.Item>
 
                     <Form.Item className="!mb-0">
-                        <Button
-                            variant="default"
-                            size="lg"
-                            className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-base rounded-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0"
-                            disabled={loading}
-                        >
+                        <Button variant="default" size="lg" className="w-full" disabled={loading}>
                             {loading ? t('loading') : t('register_button')}
                         </Button>
                     </Form.Item>
