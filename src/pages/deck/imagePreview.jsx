@@ -7,7 +7,11 @@ const ImagePreview = ({ field, fileInputRef }) => {
     const handleRemove = (e) => {
         e.stopPropagation();
 
-        form.setFieldValue([field.name, 'front', 'imageUrl'], null);
+        form.setFieldValue([field.name, 'front'], {
+            ...form.getFieldValue([field.name, 'front']),
+            imageFile: null,
+            previewUrl: null,
+        });
 
         if (fileInputRef?.current) {
             fileInputRef.current.value = '';
@@ -17,13 +21,14 @@ const ImagePreview = ({ field, fileInputRef }) => {
     return (
         <Form.Item shouldUpdate noStyle>
             {({ getFieldValue }) => {
-                const imageUrl = getFieldValue([field.name, 'front', 'imageUrl']);
+                const front = getFieldValue([field.name, 'front']);
+                const previewUrl = front?.previewUrl;
 
-                if (imageUrl) {
+                if (previewUrl) {
                     return (
                         <div className="relative w-full h-full group overflow-hidden rounded-xl">
                             <img
-                                src={imageUrl}
+                                src={previewUrl}
                                 alt="preview"
                                 className="w-full h-full object-contain"
                             />
@@ -59,5 +64,4 @@ const ImagePreview = ({ field, fileInputRef }) => {
         </Form.Item>
     );
 };
-
 export default ImagePreview;

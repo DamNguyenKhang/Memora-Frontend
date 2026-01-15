@@ -15,6 +15,7 @@ const useAxiosPrivate = () => {
         const requestIntercept = http.interceptors.request.use(
             (config) => {
                 if (!config.headers['Authorization']) {
+                    console.log('Attaching access token to request headers', auth?.accessToken);
                     config.headers['Authorization'] = `Bearer ${auth?.accessToken}`;
                 }
                 return config;
@@ -33,7 +34,10 @@ const useAxiosPrivate = () => {
                         prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
                         return http(prevRequest);
                     } catch (refreshError) {
-                        navigate(AUTHENTICATION_PAGE, { state: { redirectTo: location.pathname + location.search }, replace: true });
+                        navigate(AUTHENTICATION_PAGE, {
+                            state: { redirectTo: location.pathname + location.search },
+                            replace: true,
+                        });
                         return Promise.reject(refreshError);
                     }
                 }

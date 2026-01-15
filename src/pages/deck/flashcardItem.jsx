@@ -12,7 +12,7 @@ const difficultyOptions = [
     { value: 3, label: 'Hard', icon: Flame, color: 'text-red-600' },
 ];
 
-const FlashcardItem = ({ index, field, totalCards, onRemove }) => {
+const FlashcardItem = ({ index, field, totalCards, onRemove, imageFilesRef }) => {
     const form = Form.useFormInstance();
     const fileInputRef = useRef(null);
     const difficulty = Form.useWatch([field.name, 'difficulty'], form) ?? 1;
@@ -39,22 +39,27 @@ const FlashcardItem = ({ index, field, totalCards, onRemove }) => {
         fileInputRef.current?.click();
     };
 
-    const fileToBase64 = (file) =>
-        new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
+    // const fileToBase64 = (file) =>
+    //     new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.onload = () => resolve(reader.result);
+    //         reader.onerror = reject;
+    //         reader.readAsDataURL(file);
+    //     });
 
-    const handleImageChange = async (e) => {
+    const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const base64 = await fileToBase64(file);
-        console.log('base64', base64);
+        const previewUrl = URL.createObjectURL(file);
 
-        form.setFieldValue([field.name, 'front', 'imageUrl'], base64);
+        imageFilesRef.current[field.name] = file;
+
+        const currentFront = form.getFieldValue([field.name, 'front']) || {};
+        form.setFieldValue([field.name, 'front'], {
+            ...currentFront,
+            previewUrl,
+        });
     };
 
     return (
@@ -124,8 +129,8 @@ const FlashcardItem = ({ index, field, totalCards, onRemove }) => {
 
                 <div className="flex flex-col">
                     <label className="block text-sm font-semibold text-gray-900 mb-2">Image (Optional)</label>
-                    <Form.Item name={[field.name, 'front', 'imageUrl']} hidden />
-                    <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} hidden />
+                    <Form.Item name={[field.name, 'front']} style={{ display: 'none' }} preserve />
+                    <input type="file" accept="image/*" hidden ref={fileInputRef} onChange={handleImageChange} />
 
                     <div
                         onClick={handleChooseImage}

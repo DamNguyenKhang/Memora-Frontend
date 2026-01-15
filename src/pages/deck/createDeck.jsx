@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Plus, Sparkles, Save, Eye, X, Lock, Globe } from 'lucide-react';
 import { Dropdown, Form } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
@@ -7,11 +7,10 @@ import { Button } from '~/components/ui/button';
 import { Modal } from 'antd';
 import { Input } from '~/components/ui/input';
 import { useForm } from 'antd/es/form/Form';
-import { post } from '~/api/http';
-import { CREATE_DECK } from '~/constants/APIs';
+import { CREATE_DECK, UPLOAD_IMAGE } from '~/constants/APIs';
 import isSuccessResponse from '~/utils/checkResponse';
 import { message } from 'antd';
-import useAuth from '~/hooks/useAuth';
+import useAxiosPrivate from '~/hooks/useAxiosPrivate';
 
 const visibilityOptions = [
     {
@@ -29,12 +28,21 @@ const visibilityOptions = [
 ];
 
 const CreateDeck = () => {
-    const { auth } = useAuth();
+    const axiosPrivate = useAxiosPrivate();
     const [tags, setTags] = useState([]);
     const [isCreateTagOpen, setIsCreateTagOpen] = useState(false);
     const [newTagName, setNewTagName] = useState('');
     const [form] = useForm();
     const visibility = Form.useWatch('visibility', form) || 'private';
+    const imageFilesRef = useRef({});
+    const flashcards = Form.useWatch('flashcards', form) || [
+        {
+            id: crypto.randomUUID(),
+            front: { text: '', imageUrl: null },
+            back: { text: '', imageUrl: null },
+            difficulty: 1,
+        },
+    ];
 
     const visibilityMenuItems = visibilityOptions.map((option) => {
         const OptionIcon = option.icon;
@@ -120,17 +128,46 @@ const CreateDeck = () => {
         alert('Draft saved successfully!');
     };
 
-    const handlePublish = async (value) => {
-        const payload = {
-            ...value,
-            ownerId: auth.user.id,
-            tags: tags.length > 0 ? tags : null,
+    const buildCreateDeckFormData = (values) => {
+        const formData = new FormData();
+
+        // 1️⃣ Deck JSON
+        const deckPayload = {
+            title: values.title,
+            description: values.description,
+            tags: values.tags,
+            isPublic: values.isPublic,
+            difficulty: values.difficulty,
+            flashcards: values.flashcards.map((card, index) => ({
+                front: {
+                    text: card.front.text,
+                    imageIndex: imageFilesRef.current[index] ? index : null,
+                },
+                back: {
+                    text: card.back.text,
+                },
+            })),
         };
-        console.log('Publishing deck with payload:', payload);
+
+        formData.append('deck', JSON.stringify(deckPayload));
+
+        // 2️⃣ Images
+        Object.values(imageFilesRef.current).forEach((file) => {
+            if (file) formData.append('images', file);
+        });
+
+        return formData;
+    };
+
+    const handlePublish = async (value) => {
+        const payload = await buildCreateDeckFormData(value);
         try {
-            const response = await post(CREATE_DECK, payload);
+            const response = await axiosPrivate.post(CREATE_DECK, payload, {
+                headers: {
+                    'Content-Type': undefined,
+                },
+            });
             if (isSuccessResponse(response)) {
-                console.log('Deck published successfully:', response.data);
                 message.success('Deck published successfully!');
             }
         } catch (error) {
@@ -138,15 +175,6 @@ const CreateDeck = () => {
             console.error('Error publishing deck:', error);
         }
     };
-
-    const flashcards = Form.useWatch('flashcards', form) || [
-        {
-            id: crypto.randomUUID(),
-            front: { text: '', imageUrl: null },
-            back: { text: '', imageUrl: null },
-            difficulty: 1,
-        },
-    ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-6 py-8">
@@ -330,6 +358,7 @@ const CreateDeck = () => {
                                             field={field}
                                             onRemove={() => remove(field.name)}
                                             totalCards={fields.length}
+                                            imageFilesRef={imageFilesRef}
                                         />
                                     ))}
                                 </div>
