@@ -15,7 +15,7 @@ const difficultyOptions = [
 const FlashcardItem = ({ index, field, totalCards, onRemove, imageFilesRef }) => {
     const form = Form.useFormInstance();
     const fileInputRef = useRef(null);
-    const difficulty = Form.useWatch([field.name, 'difficulty'], form) ?? 1;
+    const difficulty = Form.useWatch(['flashcards', field.name, 'difficulty'], form) ?? 1;
     const difficultyMenuItems = difficultyOptions.map((option) => {
         const Icon = option.icon;
 
@@ -28,7 +28,9 @@ const FlashcardItem = ({ index, field, totalCards, onRemove, imageFilesRef }) =>
                     {difficulty === option.value && <CheckOutlined className="ml-auto text-indigo-600" />}
                 </div>
             ),
-            onClick: () => form.setFieldValue([field.name, 'difficulty'], option.value),
+            onClick: ({ key }) => {
+                form.setFieldValue(['flashcards', field.name, 'difficulty'], Number(key));
+            },
         };
     });
 
@@ -38,14 +40,6 @@ const FlashcardItem = ({ index, field, totalCards, onRemove, imageFilesRef }) =>
     const handleChooseImage = () => {
         fileInputRef.current?.click();
     };
-
-    // const fileToBase64 = (file) =>
-    //     new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.onload = () => resolve(reader.result);
-    //         reader.onerror = reject;
-    //         reader.readAsDataURL(file);
-    //     });
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -71,9 +65,7 @@ const FlashcardItem = ({ index, field, totalCards, onRemove, imageFilesRef }) =>
                 </span>
 
                 <div className="flex items-center gap-2">
-                    <Form.Item name={[field.name, 'difficulty']} hidden>
-                        <input />
-                    </Form.Item>
+                    <Form.Item name={[field.name, 'difficulty']} initialValue={1} noStyle />
                     {/* Difficulty Dropdown */}
                     <Dropdown
                         menu={{ items: difficultyMenuItems }}

@@ -68,7 +68,12 @@ function Header() {
                             </Dropdown>
                         ) : (
                             <>
-                                <Button size="sm" variant="link" className="text-indigo-600 hover:text-indigo-700">
+                                <Button
+                                    size="sm"
+                                    variant="link"
+                                    interaction="none"
+                                    className="text-indigo-600 hover:text-indigo-700"
+                                >
                                     <Link
                                         to={AUTHENTICATION_PAGE}
                                         state={{ tab: 'login', redirectTo: location.pathname + location.search }}

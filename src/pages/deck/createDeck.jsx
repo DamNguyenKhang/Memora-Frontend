@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Plus, Sparkles, Save, Eye, X, Lock, Globe } from 'lucide-react';
+import { Plus, Sparkles, Save, Eye, X, Lock, Globe, LayersPlusIcon } from 'lucide-react';
 import { Dropdown, Form } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import FlashcardItem from './flashcardItem';
@@ -7,7 +7,7 @@ import { Button } from '~/components/ui/button';
 import { Modal } from 'antd';
 import { Input } from '~/components/ui/input';
 import { useForm } from 'antd/es/form/Form';
-import { CREATE_DECK, UPLOAD_IMAGE } from '~/constants/APIs';
+import { CREATE_DECK } from '~/constants/APIs';
 import isSuccessResponse from '~/utils/checkResponse';
 import { message } from 'antd';
 import useAxiosPrivate from '~/hooks/useAxiosPrivate';
@@ -109,14 +109,14 @@ const CreateDeck = () => {
                 question: 'What is the capital of France?',
                 answer: 'Paris is the capital and most populous city of France.',
                 image: null,
-                difficulty: 'Easy',
+                difficulty: 1,
             },
             {
                 id: Date.now() + 1,
                 question: 'Explain the water cycle',
                 answer: 'The water cycle describes how water evaporates, forms clouds, precipitates, and returns to bodies of water.',
                 image: null,
-                difficulty: 'Easy',
+                difficulty: 1,
             },
         ];
         form.setFieldsValue({
@@ -131,7 +131,6 @@ const CreateDeck = () => {
     const buildCreateDeckFormData = (values) => {
         const formData = new FormData();
 
-        // 1️⃣ Deck JSON
         const deckPayload = {
             title: values.title,
             description: values.description,
@@ -151,7 +150,6 @@ const CreateDeck = () => {
 
         formData.append('deck', JSON.stringify(deckPayload));
 
-        // 2️⃣ Images
         Object.values(imageFilesRef.current).forEach((file) => {
             if (file) formData.append('images', file);
         });
@@ -352,9 +350,10 @@ const CreateDeck = () => {
 
                                 {/* Flashcard List */}
                                 <div className="space-y-4 mb-4">
-                                    {fields.map((field) => (
+                                    {fields.map((field, index) => (
                                         <FlashcardItem
                                             key={field.key}
+                                            index={index}
                                             field={field}
                                             onRemove={() => remove(field.name)}
                                             totalCards={fields.length}
@@ -396,8 +395,8 @@ const CreateDeck = () => {
                                 <Save className="w-4 h-4" />
                                 Save Draft
                             </Button>
-                            <Button>
-                                <Eye className="w-4 h-4" />
+                            <Button variant="gradient" type="submit">
+                                <LayersPlusIcon className="w-4 h-4" />
                                 Create
                             </Button>
                         </div>

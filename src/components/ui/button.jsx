@@ -31,39 +31,65 @@ const buttonVariants = cva(
                     hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700
                     shadow-sm
                 `,
-                destructive: `
-                    bg-destructive text-white
-                    hover:bg-destructive/90
-                `,
-                ghost: `
-                    hover:bg-accent hover:text-accent-foreground
-                `,
                 link: `
                     text-indigo-600
                     hover:text-indigo-700
                     hover:bg-indigo-50
                     px-2 py-1
                 `,
+                gradient: `
+                    bg-gradient-to-r from-indigo-500 to-purple-500
+                    text-white
+                    shadow-md
+                    hover:shadow-lg
+                `,
             },
+
+            interaction: {
+                scale: `
+                    hover:scale-[1.04]
+                    active:scale-[0.96]
+                `,
+                none: '',
+            },
+
             size: {
-                sm: 'h-9 px-4 rounded-md',
-                default: 'h-11 px-6 rounded-lg',
-                lg: 'h-12 px-8 text-base rounded-xl',
-                icon: 'size-10 rounded-full',
+                sm: 'h-9 px-4',
+                default: 'h-11 px-6',
+                lg: 'h-12 px-8 text-base',
+                icon: 'size-10',
                 custom: '',
             },
+
+            rounded: {
+                sm: 'rounded-sm',
+                md: 'rounded-md',
+                lg: 'rounded-lg',
+                xl: 'rounded-xl',
+                full: 'rounded-full',
+                none: 'rounded-none',
+            },
         },
+
         defaultVariants: {
             variant: 'default',
             size: 'default',
+            interaction: 'scale',
+            rounded: 'md',
         },
     },
 );
 
-function Button({ className, variant, size, asChild = false, ...props }) {
+function Button({ className, variant, size, interaction, rounded, asChild = false, ...props }) {
     const Comp = asChild ? Slot : 'button';
 
-    return <Comp data-slot="button" className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+    return (
+        <Comp
+            data-slot="button"
+            className={cn(buttonVariants({ variant, size, interaction, rounded }), className)}
+            {...props}
+        />
+    );
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
